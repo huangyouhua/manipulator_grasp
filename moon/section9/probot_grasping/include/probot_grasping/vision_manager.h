@@ -51,7 +51,7 @@ class VisionManager
 	 * @param      x     x postion of the object
 	 * @param      y     y position of the object
 	 */
-	bool get2DLocation(cv::Mat img, float &x, float &y);
+	bool get2DLocation(cv::Mat img, float &x, float &y, int object_color);
 
   private:
 	/**

@@ -28,7 +28,7 @@ VisionManager::VisionManager(ros::NodeHandle n_, float length, float breadth) : 
 	image2_pub_ = it_.advertise("/object_detect", 1);
 }
 
-bool VisionManager::get2DLocation(cv::Mat img, float &x, float &y)
+bool VisionManager::get2DLocation(cv::Mat img, float &x, float &y, int object_color)
 {
     this->curr_img = img;
     img_centre_x_ = img.rows / 2;
@@ -38,36 +38,22 @@ bool VisionManager::get2DLocation(cv::Mat img, float &x, float &y)
 
     static cv::Rect tablePos;
 
-
-    ros::NodeHandle n;
-    int object_color;
 	bool action_flag = true;
 
     if (first_detect)
     {
-        object_color = 0;
         detectTable(tablePos);
-        detect2DObject(x, y, tablePos, object_color);
+        detect2DObject(x, y, tablePos, 0);
         first_detect = false;
         action_flag = true;
     }
     else
     {
-        if (!n.getParam("graspingDemo/object_color", object_color))
-        {
-			object_color = 5;
-            ROS_INFO_STREAM("Cannot get param graspingDemo/object_color..");
-        }
-
-        if (object_color < 0 || object_color > 2)
-            action_flag = false;
-		else
+        if (object_color >= 0 && object_color <= 2)
 		{
 			action_flag = true;
 			detect2DObject(x, y, tablePos, object_color);
 		}
-			
-
     }
 
     convertToMM(x, y);

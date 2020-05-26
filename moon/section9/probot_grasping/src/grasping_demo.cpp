@@ -45,6 +45,7 @@ GraspingDemo::GraspingDemo(ros::NodeHandle n_, float pregrasp_x, float pregrasp_
   }
 
   grasp_running = false;
+  object_flag = true;
   
   this->pregrasp_x = pregrasp_x;
   this->pregrasp_y = pregrasp_y;
@@ -56,6 +57,7 @@ GraspingDemo::GraspingDemo(ros::NodeHandle n_, float pregrasp_x, float pregrasp_
   ROS_INFO_STREAM("Getting into the Grasping Position....");
   attainPosition(pregrasp_x, pregrasp_y, pregrasp_z);
 
+  object_color_sub_ = n_.subscribe("/object_color", 1, &GraspingDemo::ObjectColorCb, this); 
   // Subscribe to input video feed and publish object location
   image_sub_ = it_.subscribe("/probot_anno/camera/image_raw", 1, &GraspingDemo::imageCb, this);
 }
@@ -77,7 +79,9 @@ void GraspingDemo::imageCb(const sensor_msgs::ImageConstPtr &msg)
 
     // ROS_INFO("Image Message Received");
     float obj_x, obj_y;
-    object_flag = vMng_.get2DLocation(cv_ptr->image, obj_x, obj_y);
+
+    if(object_flag)
+      action_flag = vMng_.get2DLocation(cv_ptr->image, obj_x, obj_y, object_color);
 
     // Temporary Debugging
     std::cout<< " X-Co-ordinate in Camera Frame :" << obj_x << std::endl;
@@ -95,6 +99,15 @@ void GraspingDemo::imageCb(const sensor_msgs::ImageConstPtr &msg)
     std::cout<< " Y-Co-ordinate in Robot Frame :" << obj_robot_frame.getY() << std::endl;
     std::cout<< " Z-Co-ordinate in Robot Frame :" << obj_robot_frame.getZ() << std::endl;
   }
+}
+
+void GraspingDemo::ObjectColorCb(const probot_msgs::ObjectColor::ConstPtr &msg)
+{
+  object_color = msg->object_color;
+  if (object_color < 0 || object_color > 2)
+    object_flag = false;
+  else object_flag = true;
+
 }
 
 void GraspingDemo::attainPosition(float x, float y, float z)
@@ -194,7 +207,7 @@ void GraspingDemo::initiateGrasping()
 
   homePose = armgroup.getCurrentPose();
   
-  if(object_flag)
+  if(object_flag && action_flag)
   {
     ROS_INFO_STREAM("Approaching the Object....");
     attainObject();
@@ -204,6 +217,8 @@ void GraspingDemo::initiateGrasping()
 
     ROS_INFO_STREAM("Lifting the Object....");
     lift();
+    object_flag = false;
+    action_flag = false;
   }
 
   grasp_running = false;

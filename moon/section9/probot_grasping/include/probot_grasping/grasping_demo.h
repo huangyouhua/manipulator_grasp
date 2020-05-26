@@ -27,7 +27,7 @@ limitations under the License.
 #include <moveit_visual_tools/moveit_visual_tools.h>
 #include <cv_bridge/cv_bridge.h>
 #include <tf/transform_listener.h>
-
+#include <probot_msgs/ObjectColor.h>
 #include "probot_grasping/vision_manager.h"
 
 class GraspingDemo
@@ -58,19 +58,28 @@ class GraspingDemo
      */
 	image_transport::Subscriber image_sub_;
 	/**
+     * @brief subscribes to /object_color topic
+     */
+	ros::Subscriber object_color_sub_;
+	/**
      * @brief boolean to control the grasping movements
      */
-
 	bool grasp_running;
 	/**
      * @brief boolean to check if there is a object
      */
-
 	bool object_flag;
+	/**
+     * @brief boolean to check if motion
+     */
+	bool action_flag;
+	/**
+     * @brief boolean to check if there is a object
+     */
+	int object_color;
 	/**
      * @brief cv_ptr is the pointer to image as received by it_
      */
-
 	cv_bridge::CvImagePtr cv_ptr;
 	/**
      * @brief vMng_ is the instance of the library for object detection
@@ -147,6 +156,12 @@ class GraspingDemo
 	 * @param[in]  msg   Image received as a message
 	 */
 	void imageCb(const sensor_msgs::ImageConstPtr &msg);
+	/**
+	 * @brief      ObjectColorCb is called when a new object_color is received.
+	 *
+	 * @param[in]  msg   object_color received as a message
+	 */
+	void ObjectColorCb(const probot_msgs::ObjectColor::ConstPtr &msg);
 	/**
 	 * @brief      initiateGrasping initiates the grasping behaviour
 	 */
