@@ -62,11 +62,11 @@ class GraspingDemo
      */
 
 	bool grasp_running;
-	// /**
-    //  * @brief boolean to check if there is a object
-    //  */
+	/**
+     * @brief boolean to check if there is a object
+     */
 
-	// bool object_detected;
+	bool object_flag;
 	/**
      * @brief cv_ptr is the pointer to image as received by it_
      */

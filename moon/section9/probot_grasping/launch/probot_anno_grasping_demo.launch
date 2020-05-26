@@ -9,7 +9,7 @@
         <param name="pregrasp_x"            value="0.20"/>
         <param name="pregrasp_y"            value="-0.17"/>
         <param name="pregrasp_z"            value="0.28"/>
-        <param name="color_param"          value="5"/>
+        <param name="object_color"          value="5"/>
     </node>
 
 </launch>

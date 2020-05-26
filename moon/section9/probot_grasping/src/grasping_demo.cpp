@@ -77,7 +77,7 @@ void GraspingDemo::imageCb(const sensor_msgs::ImageConstPtr &msg)
 
     // ROS_INFO("Image Message Received");
     float obj_x, obj_y;
-    vMng_.get2DLocation(cv_ptr->image, obj_x, obj_y);
+    object_flag = vMng_.get2DLocation(cv_ptr->image, obj_x, obj_y);
 
     // Temporary Debugging
     std::cout<< " X-Co-ordinate in Camera Frame :" << obj_x << std::endl;
@@ -158,23 +158,6 @@ void GraspingDemo::lift()
   target_pose1.orientation = currPose.pose.orientation;
   target_pose1.position = currPose.pose.position;
 
-  // Starting Postion after picking
-  //target_pose1.position.z = target_pose1.position.z + 0.06;
-
-  // if(rand() % 2)
-  // {
-  //   target_pose1.position.y = target_pose1.position.y + 0.02;
-  // }
-  // else
-  // {
-  //   target_pose1.position.y = target_pose1.position.y - 0.02;
-  // }
-  
-  //up 
-  // target_pose1.position.z = target_pose1.position.z + 0.02;
-  // armgroup.setPoseTarget(target_pose1);
-  // armgroup.move();
-
   // translation
   target_pose1.position.y = 0.1;
   armgroup.setPoseTarget(target_pose1);
@@ -211,17 +194,17 @@ void GraspingDemo::initiateGrasping()
 
   homePose = armgroup.getCurrentPose();
   
-  ROS_INFO_STREAM("Approaching the Object....");
-  attainObject();
+  if(object_flag)
+  {
+    ROS_INFO_STREAM("Approaching the Object....");
+    attainObject();
 
-  ROS_INFO_STREAM("Attempting to Grasp the Object now..");
-  grasp();
+    ROS_INFO_STREAM("Attempting to Grasp the Object now..");
+    grasp();
 
-  ROS_INFO_STREAM("Lifting the Object....");
-  lift();
-
-  // ROS_INFO_STREAM("Going back to home position....");
-  // goHome();
+    ROS_INFO_STREAM("Lifting the Object....");
+    lift();
+  }
 
   grasp_running = false;
 }
